@@ -1,6 +1,6 @@
 # Continuous-Deployment Scripts
 STILL IN HEAVY DEVELOPMENT AND NOT READY NOW!
-Useat your own risk. :smirk:
+Use at your own risk. :smirk:
 
 
 ## What is it?
