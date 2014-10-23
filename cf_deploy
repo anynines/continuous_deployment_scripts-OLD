@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Stop if an command returns an error
+set -e
+
+# Take all additional apps to deploy out of the ENV ADDITIONAL_APPS
+IFS=',' read -a additional_apps <<< "$ADDITIONAL_APPS"
+
+check_for_required_envs(){
+  if [ -b "$CF_USER" ]; then
+    echo "You need to set CF_USER environment variable to the user for cf auth."
+    exit $E_BADARGS
+  fi
+
+  if [ -b "$CF_PASSWORD" ]; then
+    echo "You need to set CF_PASSWORD environment variable to the password for cf auth."
+    exit $E_BADARGS
+  fi
+
+  if [ -b "$CF_ORG" ]; then
+    echo "You need to set CF_ORG environment variable to the cf organisation you want to push to."
+    exit $E_BADARGS
+  fi
+
+  if [ -b "$CF_SPACE" ]; then
+    echo "You need to set CF_SPACE environment variable to the cf space you want to push to."
+    exit $E_BADARGS
+  fi
+}
+
+# Download the cf client archive, extract it, delete the archive (depending if it is osx or linux) and add cf in .cfignore 
+setup_cf_client() {
+  is_darwin=`uname -a | grep Darwin | cat`
+
+  if [ -n "$is_darwin" ]; then
+    wget https://github.com/cloudfoundry/cli/releases/download/v6.0.2/cf-darwin-amd64.tgz
+    tar xzf cf-darwin-amd64.tgz
+    rm cf-darwin-amd64.tgz
+  else
+    wget https://s3.amazonaws.com/go-cli/releases/v6.1.2/cf-linux-amd64.tgz
+    tar xzf cf-linux-amd64.tgz
+    rm cf-linux-amd64.tgz
+  fi
+
+  echo "cf" >> .cfignore
+}
+
+auth_to_anynines() {
+  ./cf api https://api.de.a9s.eu
+  ./cf auth "$CF_USER" "$CF_PASSWORD"
+  ./cf target -o "$CF_ORG" -s "$CF_SPACE"
+}
+
+prepare_rails_production_db() {
+  if [ -f config/database.yml ]; then
+    write_production_to_database_yml
+  fi
+}
+
+write_production_to_database_yml() {
+echo "
+production:
+  adapter: postgresql
+  host: localhost
+  encoding: unicode
+  pool: 10
+  username: postgres
+  template: template1
+  password: test
+  database: test<%= ENV['TEST_ENV_NUMBER'] %>
+  port: 5432
+  sslmode: disable
+" >> config/database.yml
+}
+
+precompile_assets() {
+  RAILS_ENV=production bundle exec rake assets:clean assets:precompile
+}
+
+set_app_to_push() {
+  started_green=`./cf apps | grep started | grep green | cat`
+
+  if [ -n "$started_green" ]; then
+    app_to_push=`grep blue manifest.yml | cut -d " " -f 3`
+  else
+    app_to_push=`grep green manifest.yml | cut -d " " -f 3`
+  fi
+}
+
+push_main_app() {
+  ./cf push $app_to_push
+}
+
+push_additional_apps() {
+  for app_name in "${additional_apps[@]}"
+  do
+    ./cf push $app_name
+  done
+}
+
+main() {
+  setup_cf_client
+  auth_to_anynines
+  prepare_rails_production_db
+  precompile_assets
+  set_app_to_push
+  push_main_app
+  push_additional_apps
+}
+
+main
