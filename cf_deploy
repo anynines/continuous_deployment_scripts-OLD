@@ -94,7 +94,7 @@ push_main_app() {
 }
 
 stop_old_application() {
-  ./cf push $app_to_stop
+  ./cf stop $app_to_stop
 }
 
 push_additional_apps() {
