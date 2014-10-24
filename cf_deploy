@@ -82,13 +82,19 @@ set_app_to_push() {
 
   if [ -n "$started_green" ]; then
     app_to_push=`grep blue manifest.yml | cut -d " " -f 3`
+    app_to_stop=`grep green manifest.yml | cut -d " " -f 3`
   else
     app_to_push=`grep green manifest.yml | cut -d " " -f 3`
+    app_to_stop=`grep blue manifest.yml | cut -d " " -f 3`
   fi
 }
 
 push_main_app() {
   ./cf push $app_to_push
+}
+
+stop_old_application() {
+  ./cf push $app_to_stop
 }
 
 push_additional_apps() {
@@ -105,6 +111,7 @@ main() {
   precompile_assets
   set_app_to_push
   push_main_app
+  stop_old_application
   push_additional_apps
 }
 
