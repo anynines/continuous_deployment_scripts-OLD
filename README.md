@@ -10,7 +10,7 @@ The script does the following:
 1. Download the cf CLI in version 1.6.2
 2. Auth your cf user
 3. Target your cf organisation and space
-4. Precompile your assets
+4. Precompile your assets (Rails only)
 6. Push the not started application (green or blue)
 7. Stops the old application (green or blue)
 8. Push additional applications if setup (like workers, clockwork or so)

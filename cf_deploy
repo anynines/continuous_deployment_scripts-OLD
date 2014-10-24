@@ -74,7 +74,13 @@ production:
 }
 
 precompile_assets() {
-  RAILS_ENV=production bundle exec rake assets:clean assets:precompile
+  if [ -f Gemfile ]; then
+    is_rails=`cat Gemfile | grep rails | cat`
+  fi
+
+  if [ -n "$is_rails" ]; then
+    RAILS_ENV=production bundle exec rake assets:clean assets:precompile
+  fi
 }
 
 set_app_to_push() {
