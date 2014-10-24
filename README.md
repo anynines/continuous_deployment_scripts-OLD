@@ -24,4 +24,10 @@ First of all you have to configure it properly through ENV variables
 ### Configuration
 There are several properties you can/must configure to use this script, here is a table of all available ENV variables.
 
-TBD
+| ENV name | Description | required |
+|:--------:|:-----------:|:--------:|
+| CF_USER | Your anynines user to deploy with | yes |
+| CF_PASSWORD | The password for your CF_USER | yes |
+| CF_ORG | The anynines organisation where you want to push your app(s) | yes |
+| CF_SPACE | The anynines space where you want to push your app(s) | yes |
+| ADDITIONAL_APPS | You can specify additional applications to push, **seperated by commas** (i.e. workers, clockwork or so) | no |
