@@ -1,7 +1,4 @@
 # Continuous-Deployment Scripts
-STILL IN HEAVY DEVELOPMENT AND NOT READY NOW!
-Use at your own risk. :smirk:
-
 
 ## What is it?
 Script(s) for continuous deployment (blue-green) on Anynines for usage
@@ -15,7 +12,7 @@ The script does the following:
 3. Target your cf organisation and space
 4. Precompile your assets
 6. Push the not started application (green or blue)
-7. Stops the old application (TBD)
+7. Stops the old application (green or blue)
 8. Push additional applications if setup (like workers, clockwork or so)
 
 ## How do i use it?
@@ -39,3 +36,7 @@ and setup your CI to run it after testing via:
 ```shell
   script/cf_deploy
 ```
+
+## Do you have problems or good ideas?
+We were very happy to any kind of feedback or additions.
+Just create an issue or provide a pull request. :heart:
